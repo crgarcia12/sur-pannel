@@ -1,8 +1,9 @@
 # Hardware - Airbus-inspired SUR Air panel
 
-The first revision is a **mechanical concept**, with real printable geometry
-and provisional electronics interfaces. It is not a finished electronics
-assembly or an exact Airbus replica.
+This revision matches the **FlyByWire A32NX A320neo FCU layout at 400 mm
+wide**, with printable geometry and provisional electronics interfaces.
+It is a scaled cockpit-layout reproduction, not a certified dimensional
+replica or a finished electronics assembly.
 
 ![Assembly](assembly-preview.png)
 
@@ -10,21 +11,56 @@ assembly or an exact Airbus replica.
 
 ## Layout
 
-Three independently printable modules join into a **580 x 150 mm** desktop
+Four independently printable modules form a **580 x 250 mm** desktop
 panel. The faceplates are 3 mm thick; rear trays are 42 mm deep with 3 mm
-walls. No individual exported part exceeds a conservative 200 x 200 mm
+walls. The APU module attaches above the lights/signs module. No individual
+exported part exceeds a conservative 220 x 220 mm
 footprint, leaving ample room on the H2C for a brim.
 
 | Module | Faceplate | Controls |
 |---|---|---|
 | Lights and signs | 180 x 150 mm | LAND, TAXI, STROBE, BEACON; SEATBELT; MECH and FWD call buttons |
-| FCU speed and heading | 200 x 150 mm | SPD/MACH and HDG/TRK displays and knobs; SPD/MACH mode; FD, LS, LOC, APPR |
-| FCU altitude and vertical speed | 200 x 150 mm | ALT and V/S/FPA displays and knobs; HDG/TRK mode; 100/1000 selector; AP1, AP2, A/THR, EXPED |
+| FCU speed and heading | 190 x 150 mm | SPD and HDG display strip; SPD/MACH button; speed and heading knobs; LOC; AP1 |
+| FCU altitude and vertical speed | 210 x 150 mm | ALT and V/S display strip; HDG V/S / TRK FPA mode button; AP2, A/THR; concentric 100/1000 selector; METRIC ALT; EXPED; APPR |
+| APU and auxiliary EFIS controls | 180 x 100 mm | MASTER SW, START, APU BLEED illuminated pushbuttons; FD and LS |
 
-The gray-blue faceplates, white legends, amber display references, scalloped
-rotary knobs, square vertical-speed knob, and square annunciator buttons
-follow Airbus visual cues. The actual red/white SUR Air website logo is
-traced and raised on the lights/signs faceplate.
+The FCU reproduces the cockpit's continuous upper display strip, central
+AP1/AP2 and A/THR cluster, round mode buttons, LOC/EXPED/APPR positions,
+smooth eccentric speed/V/S knobs, lobed heading knob with triangular index,
+and scalloped altitude knob inside a separate 100/1000 selector collar.
+Generic push/pull instructions were removed from the FCU face; the aircraft's
+PUSH TO LEVEL OFF legend remains beside V/S. Display references use amber
+seven-segment geometry and managed-mode dots.
+
+FD and LS belong to the aircraft's separate EFIS panel, not the FCU.
+They are retained as auxiliary controls on the APU module without changing
+the cockpit FCU layout. The actual red/white SUR Air website logo remains
+raised on the lights/signs faceplate.
+
+References: [A32NX FCU](https://docs.flybywiresim.com/pilots-corner/a32nx/a32nx-briefing/flight-deck/glareshield/fcu/),
+[APU](https://docs.flybywiresim.com/pilots-corner/a32nx/a32nx-briefing/flight-deck/ovhd/apu/),
+and [APU bleed](https://docs.flybywiresim.com/pilots-corner/a32nx/a32nx-briefing/flight-deck/ovhd/ac/).
+The front layout follows the FCU image linked by the official documentation.
+The 400 mm width, split faceplates, provisional bores, and raised printed
+legends are intentional manufacturing adaptations.
+
+## Illuminated APU controls
+
+| Pushbutton | Upper annunciator | Lower annunciator |
+|---|---|---|
+| MASTER SW | Amber FAULT | Blue ON |
+| START | Green AVAIL | Blue ON |
+| APU BLEED | Amber FAULT | Blue ON |
+
+Each printable cap has two separated optical bays, two 3.2 mm rear LED
+bores, and two independently printable diffusers. The central partition
+limits light bleed between states. Annunciator text is raised on the
+diffusers, not bonded across the cap's light openings.
+
+APU BLEED follows the A32NX's blue ON indication, not a white OFF indicator.
+These windows show where the lights go; hardware, current-limiting drivers,
+and simulator-controlled illumination remain to be installed. Do not wire
+all indicators together: START ON and AVAIL represent different states.
 
 MECH and FWD are treated as momentary calls, not maintained cabin signs.
 The initial switches are simple ON/OFF references; Airbus three-position
@@ -34,10 +70,12 @@ are selected.
 ## Files
 
 - `sur-air-panel-assembly.f3d`: native editable assembly, including all modules.
-- `01-*.f3d`, `02-*.f3d`, `03-*.f3d`: individual module archives.
-- `04-*.f3d`: four printable knob designs.
+- `01-*.f3d`, `02-*.f3d`, `03-*.f3d`, `06-*.f3d`: individual module archives.
+- `04-*.f3d`: four printable knob designs and altitude selector collar.
 - `05-*.f3d`: rear joining bridges.
-- `stl/`: faceplates, trays, knobs, and one bridge design; print four bridges.
+- `07-*.f3d`: printable APU caps with separated light bays.
+- `08-*.f3d`: six printable, labeled APU diffusers.
+- `stl/`: 23 unique parts; print six copies of the bridge.
 - `parts.json`: measured dimensions and solid-body information for exported parts.
 - `check_exports.py`: verify native archive integrity, STL dimensions and watertightness.
 - `build_panel.py`: reproducible Fusion 360 Python source with an editable timeline.
@@ -52,31 +90,38 @@ The logo belongs to SUR Air; no ownership or license is asserted for that asset.
 
 | Interface | Initial geometry | Selection needed |
 |---|---|---|
-| Light/seatbelt switches and altitude selector | 6.5 mm bore | Threaded miniature toggle switches and retaining nuts |
+| Light/seatbelt switches | 6.5 mm bore | Threaded miniature toggle switches and retaining nuts |
 | Four FCU encoders | 7.2 mm mounting bore | Encoders with actual push/pull mechanism or a separately designed mechanism |
-| Twelve pushbuttons | 12.2 mm bore | Two call buttons, eight lower FCU buttons, two mode buttons; square external caps |
-| Display apertures | Four 68 x 20 mm windows | Actual displays, carrier boards and fasteners |
+| Thirteen conventional pushbuttons | 12.2 mm bore | Two call buttons, nine authentic FCU buttons, FD and LS |
+| APU caps | Three 24.4 x 24.4 mm apertures | 24 x 24 mm caps; actual switch carriers and travel stops still need designing |
+| APU light bays | Two 20 x 8 mm cavities per cap; 3.2 mm LED bores | Six independently driven LEDs and translucent diffusers |
+| APU diffusers | 17.6 x 5.6 x 1 mm plus 0.45 mm raised lettering | Translucent filament; fit-test before bonding into light windows |
+| Display apertures | 154 x 26 mm and 173 x 26 mm | Display modules/boards or a segmented display carrier |
+| Altitude collar | 36 mm outside diameter, 23 mm center clearance | Concentric selector mechanism, two detents and linkage still need designing |
 | Knob sockets | 6.2 mm round bore, 14 mm deep | Verify shaft diameter, retention and fit with a small test print |
 | Face/tray mounting | Four 3.4 mm through-holes per module | M3 bolts, nuts and washers |
-| Rear bridge mounting | Two 3.4 mm holes per bridge | Four bridges and eight short M3 bolts with nuts |
+| Rear bridge mounting | Two 3.4 mm holes per bridge | Six bridges and twelve short M3 bolts with nuts |
 | Cable routing | One 20 x 10 mm rear exit per module | Cable, strain relief and connectors |
 
-The displayed digits, switch levers, button references and annunciators
+The displayed digits, switch levers and FCU button references
 are **visual references**, not purchased hardware or printable functioning
 mechanisms. In Fusion, hide the component named
 `VISUAL REFERENCES - switches and buttons - NOT PRINTABLE` to inspect the
-mounting holes. Display digits remain separate reference bodies in the
-FCU components and are excluded from faceplate STL exports.
+mounting holes. The APU caps and diffusers are actual printable parts;
+their colored appearances illustrate independent indicator colors.
+They do not contain electrical components.
 
-Push/pull legends describe the intended FCU interaction. The printable
-knobs alone do not implement that motion. Electronics, display mounts,
+The printable knobs alone do not implement FCU push/pull motion.
+Electronics, display mounts, APU switch carriers,
 encoder retention, switch anti-rotation features and strain relief must
 be designed after the actual components are chosen.
 
 ## Printing and assembly
 
 Use gray-blue PETG or PLA for the plates and trays, white for the knobs,
-and white/red for the raised legends/logo. Faceplate STLs contain the
+black for the APU caps, translucent filament for the diffusers, and
+white/red for the raised legends/logo. The heading index can be painted
+blue in the slicer. Faceplate STLs contain the
 raised geometry but STL does not retain colors: paint the raised surfaces
 in the slicer for a multi-color print, or finish them after printing.
 
@@ -85,8 +130,17 @@ flat rear side on the bed, trays with their rear side on the bed, knobs
 with their socket openings facing upward, and bridges flat. Inspect thin
 legends and the logo in the slicer; use finer layers where needed.
 
-Print one faceplate and tray for each module, one of each knob, and four
-bridges. The bridges bolt through adjacent tray backs; faceplates bolt
+Print one faceplate and tray for each module, one of each knob and the
+altitude collar, three APU caps, six translucent diffusers, and six bridges.
+Print APU caps rear-side down so the light bays open upward. Print diffusers
+flat, lettering upward; opaque white lettering over a translucent base is
+optional. Test each optical bay with a separate LED before bonding diffusers.
+Use amber LEDs for FAULT, green for AVAIL, and blue for ON; the six
+indicators require independent control.
+
+Four bridges join the horizontal panels, and two rotated bridges attach
+the APU module above lights/signs. The bridges bolt through adjacent tray
+backs; faceplates bolt
 through the corner columns. Choose bolt lengths from the measured stack:
 corner holes run through the full tray and faceplate, not just the plate.
 Mount electronics before closing the trays.
@@ -120,3 +174,7 @@ inside Fusion's Python environment and call `check()`:
 ```powershell
 python hardware\check_exports.py
 ```
+
+In Fusion, also call `check_fusion_design(design)` to verify physical FCU
+bore locations and APU window/LED openings, opaque partitions, and feature
+health in the active design.

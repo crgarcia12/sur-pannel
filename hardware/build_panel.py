@@ -15,6 +15,7 @@ BLACK = (14, 20, 23)
 AMBER = (255, 171, 54)
 GREEN = (97, 216, 126)
 RED = (226, 27, 35)
+BLUE = (57, 150, 255)
 
 
 def build():
@@ -152,7 +153,7 @@ def build():
 
     faceplates = {}
 
-    def text(comp, label, x, y, size=3, rgb=WHITE, z=3):
+    def text(comp, label, x, y, size=3, rgb=WHITE, z=3, target_body=None):
         sk = sketch(comp, "Legend " + label, z)
         inp = sk.sketchTexts.createInput2(label, size / 10)
         inp.fontName = "Arial"
@@ -160,7 +161,7 @@ def build():
                            adsk.core.HorizontalAlignments.LeftHorizontalAlignment,
                            adsk.core.VerticalAlignments.BottomVerticalAlignment, 0)
         sk.sketchTexts.add(inp)
-        target = faceplates.get(comp.name) if z >= 3 else None
+        target = target_body if target_body is not None else faceplates.get(comp.name) if z == 3 else None
         feature = extrude(comp, collection([sk.sketchTexts.item(0)]), 0.45, "Raised legend " + label,
                           adsk.fusion.FeatureOperations.JoinFeatureOperation if target else None,
                           [target] if target else None)
@@ -187,16 +188,21 @@ def build():
             comp.features.filletFeatures.add(inp)
 
     modules = []
-    for title, x, width in (("01 LIGHTS AND SIGNS", 0, 180), ("02 FCU SPEED HEADING", 180, 200), ("03 FCU ALTITUDE VERTICAL", 380, 200)):
+    for title, x, y, width, height in (
+        ("01 LIGHTS AND SIGNS", 0, 0, 180, 150),
+        ("02 FCU SPEED HEADING", 180, 0, 190, 150),
+        ("03 FCU ALTITUDE VERTICAL", 370, 0, 210, 150),
+        ("06 APU", 0, 150, 180, 100),
+    ):
         stage("Building " + title)
-        comp = component(title, x)
-        face = box(comp, title + " faceplate", 0, 0, 0, width, 150, "faceThickness", GRAY)
+        comp = component(title, x, y)
+        face = box(comp, title + " faceplate", 0, 0, 0, width, height, "faceThickness", GRAY)
         rounded(face, comp, 4)
-        mounts = [(7, 7), (width - 7, 7), (7, 143), (width - 7, 143)]
+        mounts = [(7, 7), (width - 7, 7), (7, height - 7), (width - 7, height - 7)]
         holes(comp, face, mounts, 3.4, "Face M3 mounting holes")
-        tray = box(comp, title + " rear tray", 0, 0, -42, width, 150, "caseDepth", GRAY)
+        tray = box(comp, title + " rear tray", 0, 0, -42, width, height, "caseDepth", GRAY)
         rounded(tray, comp, 4)
-        cut_rectangle(comp, tray, 3, 3, width - 6, 144, "Tray cavity", 0, "-caseDepth + wallThickness")
+        cut_rectangle(comp, tray, 3, 3, width - 6, height - 6, "Tray cavity", 0, "-caseDepth + wallThickness")
         for i, (mx, my) in enumerate(mounts):
             boss = cylinder(comp, title + f" bolt column {i + 1}", mx, my, -39, 5, 39, GRAY)
             combine = comp.features.combineFeatures.createInput(tray, collection([boss]))
@@ -204,8 +210,11 @@ def build():
             comp.features.combineFeatures.add(combine)
         holes(comp, tray, mounts, 3.4, "Tray M3 through holes", 0, -42)
         cut_rectangle(comp, tray, width / 2 - 10, 5, 20, 10, "Rear cable exit", -39, -3)
-        for label, y in (("Lower join", 28), ("Upper join", 112)):
-            holes(comp, tray, [(11, y), (width - 11, y)], 3.4, label + " rear bridge bolts", -39, -3)
+        for label, by in (("Lower join", 28), ("Upper join", height - 38)):
+            holes(comp, tray, [(11, by), (width - 11, by)], 3.4, label + " rear bridge bolts", -39, -3)
+        if title.startswith(("01 ", "06 ")):
+            edge_y = height - 11 if title.startswith("01 ") else 11
+            holes(comp, tray, [(28, edge_y), (152, edge_y)], 3.4, "APU vertical bridge bolts", -39, -3)
         modules.append((comp, face))
         faceplates[comp.name] = face
 
@@ -235,11 +244,17 @@ def build():
     text(light, "MECH", 76, 49, 2.5)
     text(light, "FWD", 136, 49, 2.5)
 
-    def button(comp, face, offset, x, y, label, label_size=2.4):
+    def button(comp, face, offset, x, y, label, label_size=2.4, round_button=False, offset_y=0):
         holes(comp, face, [(x, y)], 12.2, label + " button bore")
-        box(previews, label + " square button reference", offset + x - 7, y - 7, 3, 14, 14, 5, BLACK)
-        box(previews, label + " annunciator reference", offset + x - 4, y - 1, 8, 8, 1.4, 0.2, GREEN)
-        text(comp, label, x - 8, y + 10, label_size)
+        if round_button:
+            cylinder(previews, label + " round button reference", offset + x, y + offset_y, 3, 6, 3, BLACK)
+            if label:
+                text(comp, label, x - 11, y - 16, label_size)
+        else:
+            box(previews, label + " square button reference", offset + x - 10, y + offset_y - 8, 3, 20, 16, 4, BLACK)
+            for dy in (1, 2.8, 4.6):
+                box(previews, label + " annunciator bar reference", offset + x - 6, y + offset_y + dy, 7, 12, 0.7, 0.2, GREEN)
+            text(comp, label, x - 8, y - 5, label_size, WHITE, 7.3)
 
     for x, label in ((87, "MECH"), (145, "FWD")):
         box(previews, label + " call button reference", x - 7, 30, 3, 14, 14, 5, BLACK)
@@ -247,54 +262,133 @@ def build():
     left, left_face = modules[1]
     right, right_face = modules[2]
     stage("Adding FCU controls and legends")
-    for comp, face, offset, fields in (
-        (left, left_face, 180, ((18, "SPD / MACH", "250", 49), (112, "HDG / TRK", "180", 143))),
-        (right, right_face, 380, ((18, "ALT", "12000", 49), (112, "V/S / FPA", "+1500", 143))),
+    for comp, face, offset, dx, width in ((left, left_face, 180, 32, 154), (right, right_face, 370, 4, 173)):
+        cut_rectangle(comp, face, dx, 112, width, 26, "FCU display strip aperture")
+        box(previews, comp.name + " display reference", offset + dx, 112, 1, width, 26, 1, BLACK)
+    for comp, label, x, y, size in (
+        (left, "SPD", 42, 130, 3), (left, "HDG", 108, 130, 3), (left, "LAT", 143, 130, 3),
+        (left, "---", 43, 114, 8), (left, "---", 109, 114, 8),
+        (left, "HDG", 170, 119, 3),
+        (right, "V/S", 12, 119, 3), (right, "ALT", 71, 130, 3),
+        (right, "LVL/CH", 105, 130, 3), (right, "V/S", 150, 130, 3),
+        (right, "05000", 49, 114, 8), (right, "-----", 114, 114, 8),
     ):
-        for dx, label, digits, knob_x in fields:
-            text(comp, label, dx, 131, 3.2)
-            cut_rectangle(comp, face, dx, 104, 68, 20, label + " display aperture")
-            box(previews, label + " display reference", offset + dx, 104, 1, 68, 20, 1, BLACK)
-            text(comp, digits, dx + 7, 106, 8, AMBER, 2)
-            holes(comp, face, [(knob_x, 71)], 7.2, label + " encoder bore")
-            text(comp, "PUSH LEVEL OFF" if label == "V/S / FPA" else "PUSH MANAGED", knob_x - 26, 49, 2.3)
-            text(comp, "PULL V/S-FPA" if label == "V/S / FPA" else "PULL SELECTED", knob_x - 26, 42, 2.3)
-        line(comp, "FCU lower rule", 15, 35, 170)
-    button(left, left_face, 180, 25, 18, "FD")
-    button(left, left_face, 180, 67, 18, "LS")
-    button(left, left_face, 180, 111, 18, "LOC")
-    button(left, left_face, 180, 160, 18, "APPR")
-    button(right, right_face, 380, 25, 18, "AP1")
-    button(right, right_face, 380, 67, 18, "AP2")
-    button(right, right_face, 380, 111, 18, "A/THR")
-    button(right, right_face, 380, 160, 18, "EXPED")
-    button(left, left_face, 180, 95, 89, "SPD/MACH", 1.9)
-    button(right, right_face, 380, 95, 89, "HDG/TRK", 1.9)
-    holes(right, right_face, [(92, 59)], 6.5, "Altitude increment selector bore")
-    toggle(380 + 92, 59)
-    text(right, "100 / 1000", 79, 47, 2)
+        if label in ("---", "-----", "05000"):
+            offset = 180 if comp == left else 370
+            segments = {
+                "0": "ab cdef".replace(" ", ""), "5": "afgcd", "-": "g",
+            }
+            for i, digit in enumerate(label):
+                for segment in segments[digit]:
+                    sx, sy, sw, sh = {
+                        "a": (0.7, 8.5, 4.6, 0.8), "b": (5, 4.8, 0.8, 3.5),
+                        "c": (5, 0.9, 0.8, 3.5), "d": (0.7, 0, 4.6, 0.8),
+                        "e": (0, 0.9, 0.8, 3.5), "f": (0, 4.8, 0.8, 3.5),
+                        "g": (0.7, 4.3, 4.6, 0.8),
+                    }[segment]
+                    box(previews, "FCU display segment reference", offset + x + i * 8 + sx,
+                        y + sy, 2, sw, sh, 0.3, AMBER)
+        else:
+            text(comp, label, x, y, size, AMBER, 2)
+    for x in (261, 327, 468):
+        cylinder(previews, "Managed mode dot reference", x, 120, 2, 2.2, 0.3, AMBER)
+    holes(left, left_face, [(56, 66), (120, 66)], 7.2, "Speed and heading encoder bores")
+    holes(right, right_face, [(88, 66), (170, 66)], 7.2, "Altitude and vertical-speed encoder bores")
+    button(left, left_face, 180, 15, 86, "SPD MACH", 2.7, True)
+    button(right, right_face, 370, 10, 86, "", 2.5, True)
+    text(left, "HDG", 166, 87, 2.5)
+    text(left, "TRK", 166, 80, 2.5)
+    text(right, "V/S", 27, 87, 2.5)
+    text(right, "FPA", 27, 80, 2.5)
+    button(right, right_face, 370, 122, 86, "METRIC ALT", 2.5, True)
+    button(left, left_face, 180, 130, 18, "LOC")
+    button(left, left_face, 180, 177, 62, "AP 1")
+    button(right, right_face, 370, 29, 62, "AP 2")
+    button(right, right_face, 370, 10, 27, "A/THR")
+    button(right, right_face, 370, 91, 18, "EXPED")
+    button(right, right_face, 370, 173, 18, "APPR")
+    line(left, "FCU divider left", 158, 12, 0.7, 88)
+    line(right, "FCU divider right", 50, 12, 0.7, 88)
+    text(right, "100", 67, 91, 2.8)
+    text(right, "1000", 98, 91, 2.8)
+    text(right, "UP", 174, 91, 2.6)
+    text(right, "DN", 174, 40, 2.6)
+    text(right, "PUSH", 193, 76, 2.1)
+    text(right, "TO", 193, 70, 2.1)
+    text(right, "LEVEL", 193, 64, 2.1)
+    text(right, "OFF", 193, 58, 2.1)
+
+    apu, apu_face = modules[3]
+    stage("Building LED-ready APU pushbuttons")
+    text(apu, "APU", 72, 83, 5)
+    text(apu, "MASTER SW", 15, 68, 3)
+    text(apu, "START", 70, 68, 3)
+    text(apu, "APU BLEED", 118, 68, 3)
+    illuminated = component("07 APU ILLUMINATED CAPS", 0, 150)
+    diffuser_comp = component("08 APU DIFFUSERS", 0, 150)
+    for x, label, top, bottom, top_color in (
+        (37, "MASTER SW", "FAULT", "ON", AMBER),
+        (90, "START", "AVAIL", "ON", GREEN),
+        (143, "APU BLEED", "FAULT", "ON", AMBER),
+    ):
+        cut_rectangle(apu, apu_face, x - 12.2, 32.8, 24.4, 24.4, label + " cap aperture")
+        cap = box(illuminated, label + " illuminated cap", x - 12, 33, 0, 24, 24, 9, BLACK)
+        # Two enclosed optical bays prevent light bleed between annunciators.
+        for by, legend, tint in ((35, bottom, BLUE), (47, top, top_color)):
+            cut_rectangle(illuminated, cap, x - 10, by, 20, 8, label + " optical bay " + legend, 7, -5)
+            cut_rectangle(illuminated, cap, x - 9, by + 1, 18, 6, label + " light window " + legend, 9, -2)
+            holes(illuminated, cap, [(x, by + 4)], 3.2, label + " LED bore " + legend, 2, -2)
+            pane = box(diffuser_comp, label + " " + legend + " diffuser", x - 8.8, by + 1.2, 7, 17.6, 5.6, 1, WHITE)
+            color(pane, tint)
+            text(diffuser_comp, legend, x - 7.5, by + 1.2, 2.5, WHITE, 8, pane)
+        holes(illuminated, cap, [(x, 45)], 2.4, label + " actuator pilot", 2, -2)
+    button(apu, apu_face, 0, 65, 14, "FD", offset_y=150)
+    button(apu, apu_face, 0, 115, 14, "LS", offset_y=150)
+    text(apu, "EFIS", 14, 12, 2.5)
 
     knobs = component("04 PRINTABLE FCU KNOBS")
     stage("Building printable FCU knobs")
     for name, x, radius, style in (
-        ("SPEED", 229, 12, "round"),
-        ("HEADING", 323, 12, "round"),
-        ("ALTITUDE", 429, 14, "round"),
-        ("VERTICAL SPEED", 523, 11, "square"),
+        ("SPEED", 236, 12, "round"),
+        ("HEADING", 300, 11, "star"),
+        ("ALTITUDE", 458, 11, "scalloped"),
+        ("VERTICAL SPEED", 540, 12, "round"),
     ):
-        if style == "square":
-            body = box(knobs, name + " knob", x - 11, 60, 5, 22, 22, 18, WHITE)
-            rounded(body, knobs, 3)
+        if style == "star":
+            import math
+            sk = sketch(knobs, "Heading lobed knob", 5)
+            points = [(x + (11 if i % 2 == 0 else 8.5) * math.cos(i * math.pi / 6),
+                       66 + (11 if i % 2 == 0 else 8.5) * math.sin(i * math.pi / 6)) for i in range(12)]
+            for a, b in zip(points, points[1:] + points[:1]):
+                sk.sketchCurves.sketchLines.addByTwoPoints(pt(*a), pt(*b))
+            body = extrude(knobs, sk.profiles.item(0), 18, name + " knob").bodies.item(0)
+            body.name = name + " knob"
+            color(body, WHITE)
+            rounded(body, knobs, 1)
         else:
-            body = cylinder(knobs, name + " knob", x, 71, 5, radius, 18, WHITE)
-        holes(knobs, body, [(x, 71)], 6.2, name + " shaft socket", 5, 14)
-        if style == "round":
+            body = cylinder(knobs, name + " knob", x, 66, 5, radius, 18, WHITE)
+        holes(knobs, body, [(x, 66)], 6.2, name + " shaft socket", 5, 14)
+        if style == "star":
+            sk = sketch(knobs, "Heading triangular index", 23)
+            for a, b in zip([(x, 71), (x - 4, 63), (x + 4, 63)], [(x - 4, 63), (x + 4, 63), (x, 71)]):
+                sk.sketchCurves.sketchLines.addByTwoPoints(pt(*a), pt(*b))
+            mark = extrude(knobs, sk.profiles.item(0), 0.4, "Heading triangular index",
+                           adsk.fusion.FeatureOperations.JoinFeatureOperation, [body])
+            feature_color(mark, BLUE)
+        if style == "scalloped":
             import math
             scallops = []
             for n in range(12):
                 angle = n * math.pi / 6
-                scallops.append((x + (radius + 0.9) * math.cos(angle), 71 + (radius + 0.9) * math.sin(angle)))
+                scallops.append((x + (radius + 0.9) * math.cos(angle), 66 + (radius + 0.9) * math.sin(angle)))
             holes(knobs, body, scallops, 3.6, name + " grip scallops", 23, -18)
+        if style == "round":
+            crown = cylinder(knobs, name + " crown", x - 4, 66, 23, 8.5, 2, WHITE)
+            join = knobs.features.combineFeatures.createInput(body, collection([crown]))
+            join.operation = adsk.fusion.FeatureOperations.JoinFeatureOperation
+            knobs.features.combineFeatures.add(join)
+    collar = cylinder(knobs, "ALTITUDE increment selector collar", 458, 66, 3.5, 18, 5, WHITE)
+    holes(knobs, collar, [(458, 66)], 23, "Altitude collar central clearance", 8.5, -5)
 
     logo = json.loads((ROOT / "assets" / "logo-contours.json").read_text(encoding="utf-8"))
     for i, group in enumerate(logo["groups"]):
@@ -314,17 +408,20 @@ def build():
 
     bridges = component("05 PRINTABLE REAR JOINING BRIDGES")
     stage("Building joining bridges")
-    bridge = box(bridges, "Rear joining bridge - print four", 166, 20, -45, 28, 16, 3, GRAY)
+    bridge = box(bridges, "Rear joining bridge - print six", 166, 20, -45, 28, 16, 3, GRAY)
     holes(bridges, bridge, [(169, 28), (191, 28)], 3.4, "Bridge M3 bolt holes", -42, -3)
-    for x, y in ((180, 112), (380, 28), (380, 112)):
+    for x, y in ((180, 112), (370, 28), (370, 112)):
         body = box(bridges, f"Rear bridge at {x} {y}", x - 14, y - 8, -45, 28, 16, 3, GRAY)
         holes(bridges, body, [(x - 11, y), (x + 11, y)], 3.4, "Bridge M3 holes", -42, -3)
+    for x in (28, 152):
+        body = box(bridges, f"APU rear bridge at {x}", x - 8, 136, -45, 16, 28, 3, GRAY)
+        holes(bridges, body, [(x, 139), (x, 161)], 3.4, "APU bridge M3 holes", -42, -3)
 
     for comp, face in modules:
         stage("Joining raised legends to " + comp.name)
         decorations = [
             body for body in comp.bRepBodies
-            if body != face and body.name.startswith(("Lights rule", "Signs rule", "FCU lower rule"))
+            if body != face and body.name.startswith(("Lights rule", "Signs rule", "FCU divider"))
             and body.boundingBox.minPoint.z >= 0.299
         ]
         for body in decorations:
@@ -349,30 +446,74 @@ def export_design(design):
 
     components = list(design.allComponents)
     modules = sorted(
-        [comp for comp in components if comp.name.startswith(("01 ", "02 ", "03 "))],
+        [comp for comp in components if comp.name.startswith(("01 ", "02 ", "03 ", "06 "))],
         key=lambda comp: comp.name,
     )
     knobs = next(comp for comp in components if comp.name.startswith("04 "))
     bridges = next(comp for comp in components if comp.name.startswith("05 "))
+    illuminated = next(comp for comp in components if comp.name.startswith("07 "))
+    diffusers = next(comp for comp in components if comp.name.startswith("08 "))
     previews = next(comp for comp in components if comp.name.startswith("VISUAL REFERENCES"))
     printable = [
         (comp, body) for comp in modules for body in comp.bRepBodies
         if body.name.endswith((" faceplate", " rear tray"))
     ]
     printable += [(knobs, body) for body in knobs.bRepBodies if body.name.endswith(" knob")]
-    printable += [(bridges, bridges.bRepBodies.itemByName("Rear joining bridge - print four"))]
-    if len(modules) != 3 or len(printable) != 11 or any(body is None for _, body in printable):
+    printable += [(knobs, knobs.bRepBodies.itemByName("ALTITUDE increment selector collar"))]
+    printable += [(bridges, bridges.bRepBodies.itemByName("Rear joining bridge - print six"))]
+    printable += [(illuminated, body) for body in illuminated.bRepBodies if body.name.endswith(" illuminated cap")]
+    printable += [(diffusers, body) for body in diffusers.bRepBodies if body.name.endswith(" diffuser")]
+    if len(modules) != 4 or len(printable) != 23 or any(body is None for _, body in printable):
         raise RuntimeError("The active design does not contain the complete expected SUR Air part set.")
+
+    for body in previews.bRepBodies:
+        if body.name.startswith("Managed mode dot reference"):
+            bounds = body.boundingBox
+            center_x = (bounds.minPoint.x + bounds.maxPoint.x) / 2
+            if abs(center_x - 48.7) < 0.001:
+                objects = adsk.core.ObjectCollection.create()
+                objects.add(body)
+                transform = adsk.core.Matrix3D.create()
+                transform.translation = adsk.core.Vector3D.create(-1.9, 0, 0)
+                move = previews.features.moveFeatures.createInput2(objects)
+                move.defineAsFreeMove(transform)
+                previews.features.moveFeatures.add(move)
 
     white = design.appearances.itemByName("SUR 235-235-224")
     if white is None:
         raise RuntimeError("White legend appearance is missing from the design.")
     for comp in modules:
+        controls = {
+            "02 FCU SPEED HEADING": ((56, 66, 19), (120, 66, 18)),
+            "03 FCU ALTITUDE VERTICAL": ((88, 66, 19.5), (170, 66, 18)),
+        }.get(comp.name, ())
+        faceplate = next(body for body in comp.bRepBodies if body.name.endswith(" faceplate"))
+        for x, y, radius in controls:
+            name = f"FCU engraved-style guide ring {x}"
+            if any(feature.name == name for feature in comp.features):
+                continue
+            plane_input = comp.constructionPlanes.createInput()
+            plane_input.setByOffset(comp.xYConstructionPlane, adsk.core.ValueInput.createByString("3 mm"))
+            sk = comp.sketches.add(comp.constructionPlanes.add(plane_input))
+            sk.name = name
+            center = adsk.core.Point3D.create(x / 10, y / 10, 0)
+            for r in (radius, radius - 0.55):
+                sk.sketchCurves.sketchCircles.addByCenterRadius(center, r / 10)
+            annulus = next(sk.profiles.item(i) for i in range(sk.profiles.count) if sk.profiles.item(i).profileLoops.count == 2)
+            inp = comp.features.extrudeFeatures.createInput(annulus, adsk.fusion.FeatureOperations.JoinFeatureOperation)
+            inp.setDistanceExtent(False, adsk.core.ValueInput.createByString("0.45 mm"))
+            inp.participantBodies = [faceplate]
+            feature = comp.features.extrudeFeatures.add(inp)
+            feature.name = name
+            for surface in list(feature.endFaces) + list(feature.sideFaces):
+                surface.appearance = white
+            sk.isVisible = False
+    for comp in modules:
         faceplate = next(body for body in comp.bRepBodies if body.name.endswith(" faceplate"))
         for surface in faceplate.faces:
             bounds = surface.boundingBox
             if (bounds.minPoint.z >= 0.2999 and 0.3449 <= bounds.maxPoint.z < 0.3501
-                    and surface.appearance.id != white.id):
+                    and surface.appearance.name != white.name):
                 surface.appearance = white
 
     for comp in components:
@@ -407,8 +548,8 @@ def export_design(design):
             raise RuntimeError(f"STL export failed: {path}")
         bounds = body.boundingBox
         size = [round((getattr(bounds.maxPoint, axis) - getattr(bounds.minPoint, axis)) * 10, 3) for axis in ("x", "y", "z")]
-        if max(size) > 200.1:
-            raise RuntimeError(f"Part exceeds the conservative 200 mm print envelope: {body.name}: {size}")
+        if max(size) > 220.1:
+            raise RuntimeError(f"Part exceeds the conservative 220 mm print envelope: {body.name}: {size}")
         report.append({"part": body.name, "file": str(path.relative_to(ROOT)), "size_mm": size,
                        "solid": body.isSolid, "volume_cm3": round(body.volume, 3)})
 
@@ -447,7 +588,7 @@ def export_design(design):
     for comp in modules:
         path = ROOT / (comp.name.lower().replace(" ", "-") + ".f3d")
         export_archive(path, comp)
-    for comp in (knobs, bridges):
+    for comp in (knobs, bridges, illuminated, diffusers):
         path = ROOT / (comp.name.lower().replace(" ", "-") + ".f3d")
         export_archive(path, comp)
     (ROOT / "parts.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

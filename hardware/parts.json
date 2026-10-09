@@ -19,99 +19,132 @@
       42.0
     ],
     "solid": true,
-    "volume_cm3": 164.982
+    "volume_cm3": 164.927
   },
   {
     "part": "02 FCU SPEED HEADING faceplate",
     "file": "stl\\02-fcu-speed-heading-faceplate.stl",
     "size_mm": [
-      200.0,
+      190.0,
       150.0,
       3.45
     ],
     "solid": true,
-    "volume_cm3": 79.813
+    "volume_cm3": 72.139
   },
   {
     "part": "02 FCU SPEED HEADING rear tray",
     "file": "stl\\02-fcu-speed-heading-rear-tray.stl",
     "size_mm": [
-      200.0,
+      190.0,
       150.0,
       42.0
     ],
     "solid": true,
-    "volume_cm3": 178.662
+    "volume_cm3": 171.822
   },
   {
     "part": "03 FCU ALTITUDE VERTICAL faceplate",
     "file": "stl\\03-fcu-altitude-vertical-faceplate.stl",
     "size_mm": [
-      200.0,
+      210.0,
       150.0,
       3.45
     ],
     "solid": true,
-    "volume_cm3": 79.707
+    "volume_cm3": 78.622
   },
   {
     "part": "03 FCU ALTITUDE VERTICAL rear tray",
     "file": "stl\\03-fcu-altitude-vertical-rear-tray.stl",
     "size_mm": [
-      200.0,
+      210.0,
       150.0,
       42.0
     ],
     "solid": true,
-    "volume_cm3": 178.662
+    "volume_cm3": 185.502
+  },
+  {
+    "part": "06 APU faceplate",
+    "file": "stl\\06-apu-faceplate.stl",
+    "size_mm": [
+      180.0,
+      100.0,
+      3.45
+    ],
+    "solid": true,
+    "volume_cm3": 47.831
+  },
+  {
+    "part": "06 APU rear tray",
+    "file": "stl\\06-apu-rear-tray.stl",
+    "size_mm": [
+      180.0,
+      100.0,
+      42.0
+    ],
+    "solid": true,
+    "volume_cm3": 126.227
   },
   {
     "part": "SPEED knob",
     "file": "stl\\speed-knob.stl",
     "size_mm": [
-      23.812,
-      23.812,
-      18.0
+      24.5,
+      24.0,
+      20.0
     ],
     "solid": true,
-    "volume_cm3": 7.312
+    "volume_cm3": 8.174
   },
   {
     "part": "HEADING knob",
     "file": "stl\\heading-knob.stl",
     "size_mm": [
-      23.812,
-      23.812,
-      18.0
+      21.367,
+      18.772,
+      18.4
     ],
     "solid": true,
-    "volume_cm3": 7.312
+    "volume_cm3": 4.623
   },
   {
     "part": "ALTITUDE knob",
     "file": "stl\\altitude-knob.stl",
     "size_mm": [
-      27.837,
-      27.837,
+      21.796,
+      21.796,
       18.0
     ],
     "solid": true,
-    "volume_cm3": 10.25
+    "volume_cm3": 6.013
   },
   {
     "part": "VERTICAL SPEED knob",
     "file": "stl\\vertical-speed-knob.stl",
     "size_mm": [
-      22.0,
-      22.0,
-      18.0
+      24.5,
+      24.0,
+      20.0
     ],
     "solid": true,
-    "volume_cm3": 8.15
+    "volume_cm3": 8.174
   },
   {
-    "part": "Rear joining bridge - print four",
-    "file": "stl\\rear-joining-bridge---print-four.stl",
+    "part": "ALTITUDE increment selector collar",
+    "file": "stl\\altitude-increment-selector-collar.stl",
+    "size_mm": [
+      36.0,
+      36.0,
+      5.0
+    ],
+    "solid": true,
+    "volume_cm3": 3.012
+  },
+  {
+    "part": "Rear joining bridge - print six",
+    "file": "stl\\rear-joining-bridge---print-six.stl",
     "size_mm": [
       28.0,
       16.0,
@@ -119,5 +152,104 @@
     ],
     "solid": true,
     "volume_cm3": 1.29
+  },
+  {
+    "part": "MASTER SW illuminated cap",
+    "file": "stl\\master-sw-illuminated-cap.stl",
+    "size_mm": [
+      24.0,
+      24.0,
+      9.0
+    ],
+    "solid": true,
+    "volume_cm3": 3.111
+  },
+  {
+    "part": "START illuminated cap",
+    "file": "stl\\start-illuminated-cap.stl",
+    "size_mm": [
+      24.0,
+      24.0,
+      9.0
+    ],
+    "solid": true,
+    "volume_cm3": 3.111
+  },
+  {
+    "part": "APU BLEED illuminated cap",
+    "file": "stl\\apu-bleed-illuminated-cap.stl",
+    "size_mm": [
+      24.0,
+      24.0,
+      9.0
+    ],
+    "solid": true,
+    "volume_cm3": 3.111
+  },
+  {
+    "part": "MASTER SW ON diffuser",
+    "file": "stl\\master-sw-on-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.643,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.101
+  },
+  {
+    "part": "MASTER SW FAULT diffuser",
+    "file": "stl\\master-sw-fault-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.643,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.102
+  },
+  {
+    "part": "START ON diffuser",
+    "file": "stl\\start-on-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.643,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.101
+  },
+  {
+    "part": "START AVAIL diffuser",
+    "file": "stl\\start-avail-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.6,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.102
+  },
+  {
+    "part": "APU BLEED ON diffuser",
+    "file": "stl\\apu-bleed-on-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.643,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.101
+  },
+  {
+    "part": "APU BLEED FAULT diffuser",
+    "file": "stl\\apu-bleed-fault-diffuser.stl",
+    "size_mm": [
+      17.6,
+      5.643,
+      1.45
+    ],
+    "solid": true,
+    "volume_cm3": 0.102
   }
 ]

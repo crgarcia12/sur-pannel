@@ -1,6 +1,7 @@
 # SUR Air panel
 
-Modular, Airbus-inspired desktop hardware for Microsoft Flight Simulator.
+Modular SUR Air desktop hardware for Microsoft Flight Simulator, with a
+400 mm FlyByWire A32NX A320neo FCU layout and LED-ready APU controls.
 
 ![SUR Air modular panel](hardware/assembly-isometric.png)
 
