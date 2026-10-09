@@ -1,0 +1,39 @@
+[
+  {
+    "file": "01-lights-and-signs.3mf",
+    "color_parts": [
+      "Panel - gray blue",
+      "Text and markings - white",
+      "SUR logo - red"
+    ],
+    "solid_bodies": 71,
+    "volume_cm3": 80.053035
+  },
+  {
+    "file": "02-fcu-speed-heading.3mf",
+    "color_parts": [
+      "Panel - gray blue",
+      "Text and markings - white"
+    ],
+    "solid_bodies": 17,
+    "volume_cm3": 72.139207
+  },
+  {
+    "file": "03-fcu-altitude-vertical.3mf",
+    "color_parts": [
+      "Panel - gray blue",
+      "Text and markings - white"
+    ],
+    "solid_bodies": 44,
+    "volume_cm3": 78.621976
+  },
+  {
+    "file": "06-apu.3mf",
+    "color_parts": [
+      "Panel - gray blue",
+      "Text and markings - white"
+    ],
+    "solid_bodies": 29,
+    "volume_cm3": 47.830886
+  }
+]

@@ -118,6 +118,39 @@ be designed after the actual components are chosen.
 
 ## Printing and assembly
 
+### Multicolor without painting
+
+Use the files in **`multicolor/`** instead of the single-body faceplate STLs.
+Each `.3mf` contains one aligned assembly with named, independently
+assignable material parts:
+
+| Part | Filament assignment |
+|---|---|
+| Panel - gray blue | Panel filament |
+| Text and markings - white | White lettering, rules, dial rings and white AIR logo |
+| SUR logo - red | Red SUR lettering and arrow; lights/signs module only |
+
+Open `multicolor/01-lights-and-signs.3mf` in Bambu Studio. If it reports
+that the file has no valid printer configuration, choose **load geometry
+only**: these are model files, not printer presets. Select your H2C and
+add the desired filaments. In **Objects**, expand the panel and assign
+each named part to its filament. Existing project filament colors can
+make the initial preview look different; map the parts to your own slots.
+Do not split, arrange or drop the lettering parts individually: their
+coordinates keep them attached to the panel at the correct height.
+Save the mapped project as a Bambu Studio `.3mf`.
+
+The other three files provide gray/white separation for both FCU
+faceplates and the APU faceplate. `sur-air-color-separated.f3d` in this
+folder preserves separate editable solids in Fusion; the original
+assembly and single-body STLs remain available.
+
+To regenerate these files, load `export_multicolor.py` in Fusion and call
+`export()`. It reopens a copy of the saved assembly, splits the plates
+at the 3 mm base surface, preserves body appearances and volume, welds
+mesh vertices, and writes the 3MF material groups and Bambu part metadata.
+Run `python hardware\check_multicolor.py` to validate the output.
+
 Use gray-blue PETG or PLA for the plates and trays, white for the knobs,
 black for the APU caps, translucent filament for the diffusers, and
 white/red for the raised legends/logo. The heading index can be painted
