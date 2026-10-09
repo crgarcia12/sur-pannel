@@ -1,0 +1,123 @@
+[
+  {
+    "part": "01 LIGHTS AND SIGNS faceplate",
+    "file": "stl\\01-lights-and-signs-faceplate.stl",
+    "size_mm": [
+      180.0,
+      150.0,
+      3.6
+    ],
+    "solid": true,
+    "volume_cm3": 80.053
+  },
+  {
+    "part": "01 LIGHTS AND SIGNS rear tray",
+    "file": "stl\\01-lights-and-signs-rear-tray.stl",
+    "size_mm": [
+      180.0,
+      150.0,
+      42.0
+    ],
+    "solid": true,
+    "volume_cm3": 164.982
+  },
+  {
+    "part": "02 FCU SPEED HEADING faceplate",
+    "file": "stl\\02-fcu-speed-heading-faceplate.stl",
+    "size_mm": [
+      200.0,
+      150.0,
+      3.45
+    ],
+    "solid": true,
+    "volume_cm3": 79.813
+  },
+  {
+    "part": "02 FCU SPEED HEADING rear tray",
+    "file": "stl\\02-fcu-speed-heading-rear-tray.stl",
+    "size_mm": [
+      200.0,
+      150.0,
+      42.0
+    ],
+    "solid": true,
+    "volume_cm3": 178.662
+  },
+  {
+    "part": "03 FCU ALTITUDE VERTICAL faceplate",
+    "file": "stl\\03-fcu-altitude-vertical-faceplate.stl",
+    "size_mm": [
+      200.0,
+      150.0,
+      3.45
+    ],
+    "solid": true,
+    "volume_cm3": 79.707
+  },
+  {
+    "part": "03 FCU ALTITUDE VERTICAL rear tray",
+    "file": "stl\\03-fcu-altitude-vertical-rear-tray.stl",
+    "size_mm": [
+      200.0,
+      150.0,
+      42.0
+    ],
+    "solid": true,
+    "volume_cm3": 178.662
+  },
+  {
+    "part": "SPEED knob",
+    "file": "stl\\speed-knob.stl",
+    "size_mm": [
+      23.812,
+      23.812,
+      18.0
+    ],
+    "solid": true,
+    "volume_cm3": 7.312
+  },
+  {
+    "part": "HEADING knob",
+    "file": "stl\\heading-knob.stl",
+    "size_mm": [
+      23.812,
+      23.812,
+      18.0
+    ],
+    "solid": true,
+    "volume_cm3": 7.312
+  },
+  {
+    "part": "ALTITUDE knob",
+    "file": "stl\\altitude-knob.stl",
+    "size_mm": [
+      27.837,
+      27.837,
+      18.0
+    ],
+    "solid": true,
+    "volume_cm3": 10.25
+  },
+  {
+    "part": "VERTICAL SPEED knob",
+    "file": "stl\\vertical-speed-knob.stl",
+    "size_mm": [
+      22.0,
+      22.0,
+      18.0
+    ],
+    "solid": true,
+    "volume_cm3": 8.15
+  },
+  {
+    "part": "Rear joining bridge - print four",
+    "file": "stl\\rear-joining-bridge---print-four.stl",
+    "size_mm": [
+      28.0,
+      16.0,
+      3.0
+    ],
+    "solid": true,
+    "volume_cm3": 1.29
+  }
+]
